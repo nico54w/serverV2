@@ -29,9 +29,6 @@ app.use(cookieParser());
 app.use(cors());
 
 require('./src/router.js')(app);
-app.get('/api/close',function(req, res){
-  res.sendFile(__dirname + '/public/close.html');
-});
 
 if(process.env['MODE'].toLowerCase() == 'production'){
   app.get('/*',function(req, res){
