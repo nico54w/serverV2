@@ -10,7 +10,7 @@ async function checkBets_Daily() {
     const response = await axios.default.get(xd)
     var betDay;
     if (process.env['MODE'].toLowerCase() != 'develop') betDay = DateTime.utc().startOf('day').toISO();
-    else betDay = DateTime.local().plus({day: 1}).startOf('day').toISO();
+    else betDay = DateTime.utc().plus({day: 1}).startOf('day').toISO();
     var data = response.data;
     const dolar = data.filter(item => item.casa.nombre == 'Dolar Blue')[0].casa;
     const compra = parseInt(dolar.compra);
