@@ -28,6 +28,7 @@
     "node-cron": "^2.0.3",
     "passport": "^0.4.1",
     "passport-reddit": "^0.2.4",
+    "pg": "^8.5.1",
     "sequelize": "^6.3.5",
     "sqlite3": "^5.0.0"
   },
