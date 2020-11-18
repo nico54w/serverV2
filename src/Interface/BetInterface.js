@@ -13,6 +13,11 @@ module.exports.createSimpleBet = async function (req, res) {
     }
     if (req.user.points < pointsToBet) return res.status(409).send({error: 'No tenes suficientes puntos para esa apuesta.'});
     var betDay = DateTime.utc().minus({hours: 3}).plus({day: 1}).startOf('day');
+    console.log(betDay);
+    console.log(DateTime.utc())
+    console.log(DateTime.utc().plus({day: 1}).startOf('day'))
+    console.log(DateTime.local().plus({day: 1}).startOf('day'))
+    console.log(DateTime.plus({day: 1}).startOf('day'))
     //const tomorrow = DateTime.local().plus({day: 1}).startOf('day');
     //if(betDay < tomorrow){
     //  betDay = tomorrow;
