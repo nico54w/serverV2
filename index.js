@@ -37,7 +37,9 @@ if(process.env['MODE'].toLowerCase() == 'production'){
 }
 async function main () {
   try {
-    await sequelize.sync();
+    var opt = {};
+    process.env['RESET_SYNC'] ? opt.force = true : opt.force = false;
+    await sequelize.sync(opt);
     console.log('Connection has been established successfully.');
     app.listen(port, () => {
       console.log(`LISTENING AT ${port}`);
