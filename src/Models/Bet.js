@@ -4,7 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     compra: DataTypes.NUMBER,
     venta: DataTypes.NUMBER,
     betDay: DataTypes.DATE,
-    guessOptions: DataTypes.STRING
+    guessOptions: DataTypes.STRING,
+    hitPoint: DataTypes.BOOLEAN
   }, {
     timestamps: true,
     paranoid: true

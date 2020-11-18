@@ -1,52 +1,44 @@
 const {Bet, User, Board} = require('../Models');
 const axios = require('axios');
-const { Op } = require('sequelize');
+const {Op} = require('sequelize');
 // const fs = require('fs');
 var xd = 'https://www.dolarsi.com/api/api.php?type=valoresprincipales';
-const { DateTime } = require('luxon');
-function checkBets_Daily(){
-  axios.default.get(xd).then(function(response){
+const {DateTime} = require('luxon');
+
+async function checkBets_Daily() {
+  try {
+    const response = await axios.default.get(xd)
     var betDay;
-    if(process.env['MODE'].toLowerCase() != 'develop') betDay = DateTime.local().minus({day: 1}).startOf('day').toISO();
-    else betDay = DateTime.local().startOf('day').toISO();
+    if (process.env['MODE'].toLowerCase() != 'develop') betDay = DateTime.local().startOf('day').toISO();
+    else betDay = DateTime.local().plus({day: 1}).startOf('day').toISO();
     var data = response.data;
     const dolar = data.filter(item => item.casa.nombre == 'Dolar Blue')[0].casa;
     const compra = parseInt(dolar.compra);
     const venta = parseInt(dolar.venta);
-    Bet.findAll({where: {[Op.or]: {venta: venta, compra: compra}, betDay}, include: [{model: User}]})
-    .then(function(docs){
-      docs.forEach(function(item){
-        if(item.compra == compra && item.venta == venta){
-          item.User.points += item.points * 8;
-        }else{
-          item.User.points += item.points * 4;
-        }
-        item.User.save();
-      });
-    }).finally(function(){
-      Bet.destroy({where: {betDay}}).then(function(){
-        User.findAll({include: [{model: Bet, where: {betDay}, paranoid: false}]}).then(function(users){
-          users.forEach(function(user){
-            user.getBets({raw: true, attributes: ['points']}).then(function(bets){
-              const betsPoints = bets.map(item => item.points);
-              user.usedPoints = betsPoints.reduce((a, b) => a + b, 0);
-              user.points -= pointsToBet;
-              user.totalPoints = req.user.points + req.user.usedPoints;
-              user.save();
-            })
-          })
-        }).finally(function(){
-          User.findAll({
-            limit: 10,
-            order: [['totalPoints','DESC']],
-            attributes: ['totalPoints', 'name'],
-            raw: true
-          }).then(function(topo){
-            Board.create({jsonString: JSON.stringify(topo)});
-          });
-        })
-      })
+    const docs = await Bet.findAll({where: {[Op.or]: {venta: venta, compra: compra}, betDay}, include: [{model: User}]})
+    for (const item of docs) {
+      if (item.compra == compra && item.venta == venta) {
+        item.User.points += item.points * 8;
+      } else {
+        item.User.points += item.points * 4;
+      }
+      await item.User.save();
+    }
+    await Bet.destroy({where: {betDay}})
+    const users = await User.findAll({include: [{model: Bet, where: {betDay}, paranoid: false}]})
+    for (const user of users) {
+      await user.updatePoints();
+    }
+    const topo = await User.findAll({
+      limit: 9,
+      order: [['totalPoints', 'DESC']],
+      attributes: ['totalPoints', 'name'],
+      raw: true
     });
-  });
+    await Board.create({jsonString: JSON.stringify(topo)});
+  } catch (e) {
+    console.log(e);
+  }
 }
+checkBets_Daily();
 module.exports = {checkBets_Daily}

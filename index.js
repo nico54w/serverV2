@@ -37,13 +37,11 @@ if(process.env['MODE'].toLowerCase() == 'production'){
 }
 async function main () {
   try {
-    await sequelize.authenticate();
-    //await sequelize.sync({force: true});
+    await sequelize.sync();
     console.log('Connection has been established successfully.');
     app.listen(port, () => {
       console.log(`LISTENING AT ${port}`);
     });
-    require('./src/misc/CronSchedule');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
