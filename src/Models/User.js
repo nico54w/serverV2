@@ -7,15 +7,15 @@ module.exports = (sequelize, DataTypes) => {
     refreshToken: DataTypes.STRING,
     accessToken: DataTypes.STRING,
     totalPoints: {
-      type: DataTypes.NUMBER,
+      type: DataTypes.INTEGER,
       defaultValue: initialPoints
     },
     points: {
-      type: DataTypes.NUMBER,
+      type: DataTypes.INTEGER,
       defaultValue: initialPoints
     },
     usedPoints: {
-      type: DataTypes.NUMBER,
+      type: DataTypes.INTEGER,
       defaultValue: 0
     }
   }, {

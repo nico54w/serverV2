@@ -1,8 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
   var Model = sequelize.define('Bet', {
-    points: DataTypes.NUMBER,
-    compra: DataTypes.NUMBER,
-    venta: DataTypes.NUMBER,
+    points: DataTypes.INTEGER,
+    compra: DataTypes.INTEGER,
+    venta: DataTypes.INTEGER,
     betDay: DataTypes.DATE,
     guessOptions: DataTypes.STRING,
     hitPoint: DataTypes.BOOLEAN
