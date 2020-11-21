@@ -12,17 +12,16 @@ module.exports.createSimpleBet = async function (req, res) {
       return res.status(401).send({error: 'El valor tiene que ser superior a cero.'});
     }
     if (req.user.points < pointsToBet) return res.status(409).send({error: 'No tenes suficientes puntos para esa apuesta.'});
-    var betDay = DateTime.utc().plus({day: 1}).startOf('day').toISO();
-    //const tomorrow = DateTime.local().plus({day: 1}).startOf('day');
-    //if(betDay < tomorrow){
-    //  betDay = tomorrow;
-    //}
+    var hour = 23;
+    var betDay = DateTime.utc().plus({day: 1});
+    if(betDay.hour >= hour)betDay = betDay.plus({day: 1});
+    betDay = betDay.set({hour: hour, minute: 0, second: 0, millisecond: 0});
     const result = await Bet.create({
       UserId: req.user.id,
       points: pointsToBet,
       compra: compra,
       venta: venta,
-      betDay
+      betDay: betDay.toISO()
     });
     if (!result) return res.status(403).send({error: 'Error en el servidor! #001'});
     else if (result) {

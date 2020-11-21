@@ -8,14 +8,14 @@ const {DateTime} = require('luxon');
 async function checkBets_Daily() {
   try {
     const response = await axios.default.get(xd)
-    var betDay;
-    if (process.env['MODE'].toLowerCase() != 'develop') betDay = DateTime.utc().startOf('day').toISO();
-    else betDay = DateTime.utc().plus({day: 1}).startOf('day').toISO();
+    var betDay = DateTime.utc().set({hour: 23, minute: 0, second: 0, millisecond: 0});
+    if(process.env['MODE'].toLowerCase()== 'develop')betDay = betDay.plus({day: 1});
+    betDay = betDay.toISO();
     var data = response.data;
     const dolar = data.filter(item => item.casa.nombre == 'Dolar Blue')[0].casa;
     const compra = parseInt(dolar.compra);
     const venta = parseInt(dolar.venta);
-    const docs = await Bet.findAll({where: {[Op.or]: {venta: venta, compra: compra}, betDay}, include: [{model: User}]})
+    const docs = await Bet.findAll({where: {[Op.or]: {venta: venta, compra: compra}, betDay: betDay}, include: [{model: User}]})
     for (const item of docs) {
       if (item.compra == compra && item.venta == venta) {
         item.User.points += item.points * 8;
@@ -36,9 +36,12 @@ async function checkBets_Daily() {
       raw: true
     });
     await Board.create({jsonString: JSON.stringify(topo)});
+    await Bet.destroy({where: {betDay}, force: true})
   } catch (e) {
     console.log(e);
   }
 }
-checkBets_Daily();
+if(process.env['MODE'].toLowerCase() != 'develop'){
+  checkBets_Daily();
+}
 module.exports = {checkBets_Daily}
